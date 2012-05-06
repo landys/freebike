@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+	<com.google.android.maps.MapView
+	    android:id="@+id/map_view"
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"
+        android:state_enabled="true"
+        android:clickable="true"
+        android:apiKey="01DvpV4xJGsgcMLug2Qe_nxkdHV3CdRCFFRvRkQ"
+        />
+	
+	<LinearLayout
+	    android:id="@+id/navigate_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText 
+            android:id="@+id/txt_query"
+            android:hint="@string/txt_query"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        
+        
+        <Button
+            android:id="@+id/btn_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/btn_list" />
+
+        <Button
+            android:id="@+id/btn_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/btn_map" />
+    </LinearLayout>
+	
+</FrameLayout>

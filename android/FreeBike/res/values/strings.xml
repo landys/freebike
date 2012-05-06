@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!-- 
+    <string name="hello">Hello World, FreeBikeActivity!</string>
+-->
+    <string name="app_name">城市单车</string>
+    <string name="btn_sort">排序方式</string>
+    <string name="txt_query">地址</string>
+    <string name="btn_list">列表</string>
+    <string name="btn_map">地圖</string>
+
+</resources>
