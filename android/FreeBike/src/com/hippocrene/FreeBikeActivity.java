@@ -1,13 +1,18 @@
 package com.hippocrene;
 
-import com.google.android.maps.MapActivity;
-import com.google.android.maps.MapView;
-import com.google.android.maps.MyLocationOverlay;
-
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
+import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
 
 public class FreeBikeActivity extends MapActivity {
 	private MapView mMapView;
@@ -26,9 +31,16 @@ public class FreeBikeActivity extends MapActivity {
             mMapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
         }});
         mMapView.getOverlays().add(mMyLocationOverlay);
-        mMapView.getController().setZoom(10);
-        mMapView.setClickable(true);
-        mMapView.setEnabled(true);
+        
+        MapController mMapController = mMapView.getController();
+        GeoPoint point = new GeoPoint((int) (120.120029 * 1e6),
+                (int) (30.281772 * 1e6));
+        mMapController.setCenter(point);
+        mMapController.setZoom(10);
+        GeoPoint myGeoPoint = getCurrentGeoPoint();
+        if (myGeoPoint != null) {
+        	mMapController.animateTo(myGeoPoint);
+        }
         
         Button btnList = (Button)findViewById(R.id.btn_list);
         btnList.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +52,23 @@ public class FreeBikeActivity extends MapActivity {
             }
         });
         
+    }
+    
+    private GeoPoint getCurrentGeoPoint() { 
+    	Location location = null;
+    	LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    	if (locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+    		location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    	}
+    	else if (locationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)) { 
+        	location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER); 
+    	}
+    	else {
+    		return null;
+    	}
+    	
+        return new GeoPoint((int) (location.getLatitude() * 1e6), 
+                (int) (location.getLongitude() * 1e6)); 
     }
 
 	@Override

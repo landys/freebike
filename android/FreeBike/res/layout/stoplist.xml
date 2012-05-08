@@ -26,14 +26,14 @@
             android:text="@string/txt_query" />
 
         <Button
-            android:id="@+id/btn_list2"
+            android:id="@+id/btn_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="@string/btn_list" />
 
         <Button
-            android:id="@+id/btn_map2"
+            android:id="@+id/btn_map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
@@ -45,11 +45,5 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:drawSelectorOnTop="false" />
-
-    <TextView
-        android:id="@id/android:empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Can not find the file!" />
 
 </LinearLayout>
