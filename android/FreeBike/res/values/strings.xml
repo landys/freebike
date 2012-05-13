@@ -8,5 +8,6 @@
     <string name="txt_query">地址</string>
     <string name="btn_list">列表</string>
     <string name="btn_map">地图</string>
-
+    <string name="btn_search">搜索</string>
+	<string name="searchLable">搜索地图</string>
 </resources>

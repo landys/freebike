@@ -24,20 +24,28 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
- 
+
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/btn_search" />
+                
         <Button
             android:id="@+id/btn_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="@string/btn_list" />
-
+<!-- 
         <Button
             android:id="@+id/btn_map"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="@string/btn_map" />
+-->
     </LinearLayout>
 	
 </FrameLayout>
