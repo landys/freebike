@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+	android:background="@drawable/searchbg" >
     
 	<com.google.android.maps.MapView
 	    android:id="@+id/map_view"
@@ -17,7 +18,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
+<!-- 
         <EditText 
             android:id="@+id/txt_query"
             android:hint="@string/txt_query"
@@ -31,8 +32,32 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="@string/btn_search" />
-                
-        <Button
+-->
+		<Spinner android:id="@+id/settings"
+		    android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:background="@drawable/ic_launcher" />
+		
+		<Button
+            android:id="@+id/search"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/searchbtn"
+            android:gravity="center_vertical"
+            android:hint="@string/txt_search_hint"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:layout_weight="1" />
+		
+		<ImageButton  android:background="@drawable/maptitlebtn"
+		     android:layout_marginLeft="5dp"
+			 android:id="@+id/loction"  android:src="@drawable/loction"
+			 android:layout_width="wrap_content"
+			 android:layout_height="wrap_content"
+			/>
+		
+		<Button
             android:id="@+id/btn_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

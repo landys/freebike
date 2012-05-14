@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <searchable
   xmlns:android="http://schemas.android.com/apk/res/android"
-  android:hint="@string/searchLable" 
-  android:label="@string/searchLable"
+  android:hint="@string/txt_search_hint" 
+  android:label="@string/txt_search_hint"
   android:searchSuggestAuthority="com.android.fzmap.map.SearchSuggestionProvider"
   android:searchSuggestSelection=" ? ">
   

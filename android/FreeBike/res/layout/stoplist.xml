@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <Button
+        <Spinner
             android:id="@+id/btn_sort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:text="@string/txt_query" />
+            android:text="@string/txt_search_hint" />
 <!--
         <Button
             android:id="@+id/btn_list"
