@@ -9,4 +9,6 @@
     <string name="btn_map">地图</string>
     <string name="btn_search">搜索</string>
     <string name="txt_search_hint">搜索地图</string>
+    <string name="btn_my_location">我的位置</string>
+    <string name="btn_addr_location">搜索位置</string>
 </resources>

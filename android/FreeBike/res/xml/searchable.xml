@@ -3,7 +3,7 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:hint="@string/txt_search_hint" 
   android:label="@string/txt_search_hint"
-  android:searchSuggestAuthority="com.android.fzmap.map.SearchSuggestionProvider"
+  android:searchSuggestAuthority="com.hippocrene.view.SearchSuggestionProvider"
   android:searchSuggestSelection=" ? ">
   
 </searchable>

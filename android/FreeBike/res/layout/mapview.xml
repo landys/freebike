@@ -2,75 +2,64 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-	android:background="@drawable/searchbg" >
-    
-	<com.google.android.maps.MapView
-	    android:id="@+id/map_view"
-        android:layout_width="fill_parent" 
+    android:background="@drawable/searchbg" >
+
+    <com.google.android.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:state_enabled="true"
-        android:clickable="true"
         android:apiKey="01DvpV4xJGsgcMLug2Qe_nxkdHV3CdRCFFRvRkQ"
-        />
-	
-	<LinearLayout
-	    android:id="@+id/navigate_bar"
+        android:clickable="true"
+        android:state_enabled="true" />
+
+    <LinearLayout
+        android:id="@+id/navigate_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-<!-- 
-        <EditText 
-            android:id="@+id/txt_query"
-            android:hint="@string/txt_query"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+        android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/btn_search"
+        <Spinner
+            android:id="@+id/settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:text="@string/btn_search" />
--->
-		<Spinner android:id="@+id/settings"
-		    android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
             android:background="@drawable/ic_launcher" />
-		
-		<Button
+
+        <Button
             android:id="@+id/search"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@drawable/searchbtn"
             android:gravity="center_vertical"
             android:hint="@string/txt_search_hint"
             android:singleLine="true"
-            android:textColor="#000000"
-            android:layout_weight="1" />
-		
-		<ImageButton  android:background="@drawable/maptitlebtn"
-		     android:layout_marginLeft="5dp"
-			 android:id="@+id/loction"  android:src="@drawable/loction"
-			 android:layout_width="wrap_content"
-			 android:layout_height="wrap_content"
-			/>
-		
-		<Button
+            android:textColor="#000000" />
+        
+        <ImageButton
+            android:id="@+id/addr_location"
+            android:contentDescription="@string/btn_addr_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/maptitlebtn"
+            android:src="@drawable/btn_addr_location" />
+        
+		<ImageButton
+            android:id="@+id/my_location"
+            android:contentDescription="@string/btn_my_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/maptitlebtn"
+            android:src="@drawable/btn_my_location" />
+
+        <Button
             android:id="@+id/btn_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="@string/btn_list" />
-<!-- 
-        <Button
-            android:id="@+id/btn_map"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:text="@string/btn_map" />
--->
     </LinearLayout>
-	
+
 </FrameLayout>

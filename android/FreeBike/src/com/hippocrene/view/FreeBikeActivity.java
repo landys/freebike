@@ -1,6 +1,7 @@
 package com.hippocrene.view;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,7 +18,6 @@ import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -30,32 +30,28 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 import com.hippocrene.R;
-import com.hippocrene.R.drawable;
-import com.hippocrene.R.id;
-import com.hippocrene.R.layout;
+import com.hippocrene.model.StationInfo;
+import com.hippocrene.service.WebRequestService;
 import com.hippocrene.util.CommonHelper;
 import com.hippocrene.view.MyLocationManager.LocationCallBack;
 
 public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 		OnClickListener {
 	private final String TAG = "FreeBikeActivity";
-	private MapView mapView;
+	private MapView mMapView;
 	private MapController mMapCtrl;
-	private View popView;
-	private Drawable myLocationDrawable;
-	private Drawable mylongPressDrawable;
-	private MyLocationManager fzLocation;
-	private MyItemizedOverlay myLocationOverlay;
-	private MyItemizedOverlay mLongPressOverlay;
-	private List<Overlay> mapOverlays;
-	private OverlayItem overlayitem = null;
-	private String query;
-	public GeoPoint locPoint;
+	private View mPopView;
+	private MyLocationManager mMyLocationManager;
+	private PinItemizedOverlay mMyLocationOverlay;
+	private PinItemizedOverlay mLongPressOverlay;
+	private PinItemizedOverlay mStationOverlay;
+	private PinItemizedOverlay mAddressOverlay;
 
-	ImageButton loction_Btn;
-	// ImageButton layer_Btn;
-	// ImageButton pointwhat_Btn;
-	Button search_btn;
+	private List<Overlay> mapOverlays;
+	private String mQuery;
+	private GeoPoint mLocPoint;
+	
+	private WebRequestService mWebService;
 
 	public final int MSG_VIEW_LONGPRESS = 10001;
 	public final int MSG_VIEW_ADDRESSNAME = 10002;
@@ -66,58 +62,74 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		setContentView(R.layout.mapview);
 
-		loction_Btn = (ImageButton) findViewById(R.id.loction);
-		// layer_Btn = (ImageButton)findViewById(R.id.layer);
-		// pointwhat_Btn = (ImageButton)findViewById(R.id.pointwhat);
-		// loction_Btn = (ImageButton)findViewById(R.id.loction);
-		search_btn = (Button) findViewById(R.id.search);
+		ImageButton btnMyLocation = (ImageButton) findViewById(R.id.my_location);
+		ImageButton btnAddrLocation = (ImageButton) findViewById(R.id.addr_location);
+		Button btnSearch = (Button) findViewById(R.id.search);
 
-		loction_Btn.setOnClickListener(this);
-		// layer_Btn.setOnClickListener(this);
-		// pointwhat_Btn.setOnClickListener(this);
-		search_btn.setOnClickListener(this);
+		btnMyLocation.setOnClickListener(this);
+		btnSearch.setOnClickListener(this);
+		btnAddrLocation.setOnClickListener(this);
 
-		myLocationDrawable = getResources().getDrawable(R.drawable.point_where);
-		mylongPressDrawable = getResources()
-				.getDrawable(R.drawable.point_start);
-
-		mapView = (MapView) findViewById(R.id.map_view);
-		mapView.setBuiltInZoomControls(true);
-		mapView.setClickable(true);
+		Drawable myLocationDrawable = getResources().getDrawable(R.drawable.my_location);
+		Drawable pinGreenDrawable = getResources().getDrawable(R.drawable.pin_green);
+		Drawable pinOrangeDrawable = getResources().getDrawable(R.drawable.pin_orange);
+		Drawable markerRedDrawable = getResources().getDrawable(R.drawable.marker_red);
+		
+		mMapView = (MapView) findViewById(R.id.map_view);
+		mMapView.setBuiltInZoomControls(true);
+		mMapView.setClickable(true);
 		initPopView();
-		mMapCtrl = mapView.getController();
-		myLocationOverlay = new MyItemizedOverlay(myLocationDrawable, this,
-				mapView, popView, mMapCtrl);
-		mLongPressOverlay = new MyItemizedOverlay(mylongPressDrawable, this,
-				mapView, popView, mMapCtrl);
-		mapOverlays = mapView.getOverlays();
-		mapOverlays
-				.add(new LongPressOverlay(this, mapView, mHandler, mMapCtrl));
+		mMapCtrl = mMapView.getController();
+		mMyLocationOverlay = new PinItemizedOverlay(myLocationDrawable, this, mMapView, mPopView, mMapCtrl);
+		mLongPressOverlay = new PinItemizedOverlay(pinGreenDrawable, this, mMapView, mPopView, mMapCtrl);
+		mStationOverlay = new PinItemizedOverlay(markerRedDrawable, this, mMapView, mPopView, mMapCtrl);
+		mAddressOverlay = new PinItemizedOverlay(pinOrangeDrawable, this, mMapView, mPopView, mMapCtrl);
+		
+		mapOverlays = mMapView.getOverlays();
+		mapOverlays.add(new LongPressOverlay(this, mMapView, mHandler, mMapCtrl));
 
-		// hangzhou.
+		// Hangzhou.
 		GeoPoint cityLocPoint = new GeoPoint((int) (30.281772 * 1e6), (int) (120.120029 * 1e6));
 		mMapCtrl.animateTo(cityLocPoint);
 		mMapCtrl.setZoom(16);
 		MyLocationManager.init(FreeBikeActivity.this.getApplicationContext(),
 				FreeBikeActivity.this);
-		fzLocation = MyLocationManager.getInstance();
+		mMyLocationManager = MyLocationManager.getInstance();
 
 		// button switch to list
 		Button btnList = (Button) findViewById(R.id.btn_list);
 		btnList.setOnClickListener(this);
+		
+		mWebService = new WebRequestService(this);
+		
+		initBikeStations();
+	}
+	
+	private void initBikeStations() {
+		ArrayList<StationInfo> stationInfos = mWebService.getStationInfosForLocal(0);
+		if (stationInfos != null && stationInfos.size() > 0) {
+			for (int i=0; i<stationInfos.size() && i<100; ++i) {
+				StationInfo stationInfo = stationInfos.get(i);
+				OverlayItem overlayItem = new OverlayItem(new GeoPoint((int)(stationInfo.getLongtitude() * 1e6), (int)(stationInfo.getLatitude() * 1e6)), 
+						stationInfo.getName(), stationInfo.getAddress());
+				mStationOverlay.addOverlay(overlayItem);
+			}
+			mapOverlays.add(mStationOverlay);
+			mMapView.invalidate();
+		}
 	}
 
 	private void initPopView() {
-		if (null == popView) {
-			popView = getLayoutInflater().inflate(R.layout.overlay_popup, null);
-			mapView.addView(popView, new MapView.LayoutParams(
+		if (null == mPopView) {
+			mPopView = getLayoutInflater().inflate(R.layout.overlay_popup, null);
+			mMapView.addView(mPopView, new MapView.LayoutParams(
 					MapView.LayoutParams.WRAP_CONTENT,
 					MapView.LayoutParams.WRAP_CONTENT, null,
 					MapView.LayoutParams.BOTTOM_CENTER));
-			popView.setVisibility(View.GONE);
+			mPopView.setVisibility(View.GONE);
 		}
 
 	}
@@ -133,19 +145,19 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 
 		GeoPoint point = new GeoPoint((int) (location.getLatitude() * 1E6),
 				(int) (location.getLongitude() * 1E6));
-		overlayitem = new OverlayItem(point, "我的位置", "");
+		OverlayItem overlayitem = new OverlayItem(point, "我的位置", "");
 		mMapCtrl.setZoom(16);
-		if (myLocationOverlay.size() > 0) {
-			myLocationOverlay.removeOverlay(0);
+		if (mMyLocationOverlay.size() > 0) {
+			mMyLocationOverlay.removeOverlay(0);
 		}
-		myLocationOverlay.addOverlay(overlayitem);
-		mapOverlays.add(myLocationOverlay);
+		mMyLocationOverlay.addOverlay(overlayitem);
+		mapOverlays.add(mMyLocationOverlay);
 		mMapCtrl.animateTo(point);
 	}
 	
 
 	/**
-	 * 通过经纬度获取地址
+	 * Get address by latitude and longtitude.
 	 * 
 	 * @param point
 	 * @return
@@ -178,7 +190,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 					1);
 			Address address_send = null;
 			for (Address address : addresses) {
-				locPoint = new GeoPoint((int) (address.getLatitude() * 1E6),
+				mLocPoint = new GeoPoint((int) (address.getLatitude() * 1E6),
 						(int) (address.getLongitude() * 1E6));
 				address.getAddressLine(1);
 				address_send = address;
@@ -196,7 +208,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 			switch (msg.what) {
 			case MSG_VIEW_LONGPRESS:// 处理长按时间返回位置信息
 			{
-				if (null == locPoint)
+				if (null == mLocPoint)
 					return;
 				new Thread(new Runnable() {
 					@Override
@@ -212,7 +224,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 								e.printStackTrace();
 							}
 							count++;
-							addressName = getLocationAddress(locPoint);
+							addressName = getLocationAddress(mLocPoint);
 							Log.d(TAG, "获取地址名称");
 							// 请求五次获取不到结果就返回
 							if ("".equals(addressName) && count > 5) {
@@ -235,49 +247,49 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 						}
 					}
 				}).start();
-				overlayitem = new OverlayItem(locPoint, "地址名称", "正在地址加载...");
+				OverlayItem overlayitem = new OverlayItem(mLocPoint, "地址名称", "正在地址加载...");
 				if (mLongPressOverlay.size() > 0) {
 					mLongPressOverlay.removeOverlay(0);
 				}
-				popView.setVisibility(View.GONE);
+				mPopView.setVisibility(View.GONE);
 				mLongPressOverlay.addOverlay(overlayitem);
 				mLongPressOverlay.setFocus(overlayitem);
 				mapOverlays.add(mLongPressOverlay);
-				mMapCtrl.animateTo(locPoint);
-				mapView.invalidate();
+				mMapCtrl.animateTo(mLocPoint);
+				mMapView.invalidate();
 			}
 				break;
 			case MSG_VIEW_ADDRESSNAME: {
 				// 获取到地址后显示在泡泡上
-				TextView desc = (TextView) popView
+				TextView desc = (TextView) mPopView
 						.findViewById(R.id.map_bubbleText);
 				desc.setText((String) msg.obj);
-				popView.setVisibility(View.VISIBLE);
+				mPopView.setVisibility(View.VISIBLE);
 			}
 				break;
 			case MSG_VIEW_ADDRESSNAME_FAIL: {
-				TextView desc = (TextView) popView
+				TextView desc = (TextView) mPopView
 						.findViewById(R.id.map_bubbleText);
 				desc.setText("获取地址失败");
-				popView.setVisibility(View.VISIBLE);
+				mPopView.setVisibility(View.VISIBLE);
 			}
 				break;
 			case MSG_VIEW_LOCATIONLATLNG: {
 				CommonHelper.closeProgress();
 				Address address = (Address) msg.obj;
-				locPoint = new GeoPoint((int) (address.getLatitude() * 1E6),
+				mLocPoint = new GeoPoint((int) (address.getLatitude() * 1E6),
 						(int) (address.getLongitude() * 1E6));
-				overlayitem = new OverlayItem(locPoint, "地址名称",
+				OverlayItem overlayitem = new OverlayItem(mLocPoint, "地址名称",
 						address.getAddressLine(1));
 				if (mLongPressOverlay.size() > 0) {
 					mLongPressOverlay.removeOverlay(0);
 				}
-				popView.setVisibility(View.GONE);
+				mPopView.setVisibility(View.GONE);
 				mLongPressOverlay.addOverlay(overlayitem);
 				mLongPressOverlay.setFocus(overlayitem);
 				mapOverlays.add(mLongPressOverlay);
-				mMapCtrl.animateTo(locPoint);
-				mapView.invalidate();
+				mMapCtrl.animateTo(mLocPoint);
+				mMapView.invalidate();
 			}
 				break;
 			case MSG_VIEW_LOCATIONLATLNG_FAIL: {
@@ -293,9 +305,9 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.loction: {
-			if (myLocationOverlay != null) {
-				GeoPoint point = myLocationOverlay.getCenter();
+		case R.id.my_location: {
+			if (mMyLocationOverlay != null) {
+				GeoPoint point = mMyLocationOverlay.getCenter();
 			
 				mMapCtrl.animateTo(point);
 			}
@@ -307,9 +319,9 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 			break;
 		case R.id.btn_list: {
 			Intent intent = new Intent();
-			intent.setClass(FreeBikeActivity.this, StopListActivity.class);
+			intent.setClass(FreeBikeActivity.this, StationListActivity.class);
 			startActivity(intent);
-			FreeBikeActivity.this.finish();
+			//FreeBikeActivity.this.finish();
 		}
 			break;
 		default:
@@ -319,23 +331,23 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 
 	@Override
 	public boolean onSearchRequested() {
-		// 打开浮动搜索框（第一个参数默认添加到搜索框的值）
+		// open the float search bar, the first parameter is the value of the search input box.
 		startSearch(null, false, null, false);
 		return true;
 	}
 
-	// 得到搜索结果
+	// get the search value.
 	@Override
 	public void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		// 获得搜索框里值
-		query = intent.getStringExtra(SearchManager.QUERY);
-		// 保存搜索记录
+		// get the value in search input box.
+		mQuery = intent.getStringExtra(SearchManager.QUERY);
+		// save the search history.
 		SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
 				SearchSuggestionProvider.AUTHORITY,
 				SearchSuggestionProvider.MODE);
-		suggestions.saveRecentQuery(query, null);
-		CommonHelper.showProgress(this, "正在搜索: " + query);
+		suggestions.saveRecentQuery(mQuery, null);
+		CommonHelper.showProgress(this, "正在搜索: " + mQuery);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -343,13 +355,13 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 				int count = 0;
 				while (true) {
 					count++;
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					address = searchLocationByName(query);
+//					try {
+//						Thread.sleep(500);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+					address = searchLocationByName(mQuery);
 					Log.d(TAG, "获取经纬度");
 					if (address == null && count > 5) {
 						Message msg1 = new Message();
@@ -391,7 +403,15 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		fzLocation.destoryLocationManager();
+		mMyLocationManager.destoryLocationManager();
+	}
+
+	public GeoPoint getLocPoint() {
+		return mLocPoint;
+	}
+
+	public void setLocPoint(GeoPoint locPoint) {
+		this.mLocPoint = locPoint;
 	}
 }
 

@@ -14,7 +14,12 @@ public final class CommonUtil {
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	}
 	
-	public static long stringDataToLong(SimpleDateFormat sdf, String strDate) {
+	public static String longDateToString(SimpleDateFormat sdf, long longDate) {
+		Date dt = new Date(longDate);
+		return sdf.format(dt);
+	}
+	
+	public static long stringDateToLong(SimpleDateFormat sdf, String strDate) {
 		long time = 0;
 		
 		try {

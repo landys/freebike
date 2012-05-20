@@ -23,7 +23,7 @@ import com.hippocrene.R;
 import com.hippocrene.R.id;
 
 @SuppressWarnings("rawtypes")
-public class MyItemizedOverlay extends ItemizedOverlay implements OnFocusChangeListener,OnClickListener{
+public class PinItemizedOverlay extends ItemizedOverlay implements OnFocusChangeListener,OnClickListener{
 	private static final String TAG = "MyItemizedOverlay";
 	private List<OverlayItem> overlays = new ArrayList<OverlayItem>();
 	private FreeBikeActivity mContext;
@@ -45,11 +45,11 @@ public class MyItemizedOverlay extends ItemizedOverlay implements OnFocusChangeL
 		this.itemSelectDrawable = itemSelectDrawable;
 	}
 
-	public MyItemizedOverlay(Drawable defaultMarker) {
+	public PinItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
 	}
 
-	public MyItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView, View popView, MapController mapCtrl) {
+	public PinItemizedOverlay(Drawable defaultMarker, Context context, MapView mapView, View popView, MapController mapCtrl) {
 		super(boundCenterBottom(defaultMarker));
 		itemDrawable = defaultMarker;
 		itemSelectDrawable = defaultMarker;

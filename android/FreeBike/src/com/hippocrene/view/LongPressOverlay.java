@@ -74,8 +74,8 @@ public class LongPressOverlay extends Overlay implements OnDoubleTapListener,OnG
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		mContext.locPoint = mMapView.getProjection().fromPixels((int) e.getX(),
-				(int) e.getY());
+		mContext.setLocPoint(mMapView.getProjection().fromPixels((int) e.getX(),
+				(int) e.getY()));
 		mHandler.sendEmptyMessage(mContext.MSG_VIEW_LONGPRESS);
 	}
 
