@@ -113,7 +113,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 		if (stationInfos != null && stationInfos.size() > 0) {
 			for (int i=0; i<stationInfos.size() && i<100; ++i) {
 				StationInfo stationInfo = stationInfos.get(i);
-				OverlayItem overlayItem = new OverlayItem(new GeoPoint((int)(stationInfo.getLongtitude() * 1e6), (int)(stationInfo.getLatitude() * 1e6)), 
+				OverlayItem overlayItem = new OverlayItem(new GeoPoint((int)(stationInfo.getLatitude() * 1e6), (int)(stationInfo.getLongtitude() * 1e6)), 
 						stationInfo.getName(), stationInfo.getAddress());
 				mStationOverlay.addOverlay(overlayItem);
 			}
@@ -184,6 +184,10 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 	}
 
 	private Address searchLocationByName(String addressName) {
+		if (addressName == null || addressName.length() == 0) {
+			return null;
+		}
+		
 		Geocoder geoCoder = new Geocoder(getBaseContext(), Locale.CHINA);
 		try {
 			List<Address> addresses = geoCoder.getFromLocationName(addressName,
@@ -206,7 +210,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case MSG_VIEW_LONGPRESS:// 处理长按时间返回位置信息
+			case MSG_VIEW_LONGPRESS:
 			{
 				if (null == mLocPoint)
 					return;
@@ -226,7 +230,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 							count++;
 							addressName = getLocationAddress(mLocPoint);
 							Log.d(TAG, "获取地址名称");
-							// 请求五次获取不到结果就返回
+							// request at most 5 times
 							if ("".equals(addressName) && count > 5) {
 								Message msg1 = new Message();
 								msg1.what = MSG_VIEW_ADDRESSNAME_FAIL;
@@ -260,7 +264,7 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 			}
 				break;
 			case MSG_VIEW_ADDRESSNAME: {
-				// 获取到地址后显示在泡泡上
+				// fetch the address
 				TextView desc = (TextView) mPopView
 						.findViewById(R.id.map_bubbleText);
 				desc.setText((String) msg.obj);
@@ -414,123 +418,3 @@ public class FreeBikeActivity extends MapActivity implements LocationCallBack,
 		this.mLocPoint = locPoint;
 	}
 }
-
-// import android.content.Context;
-// import android.content.Intent;
-// import android.location.Location;
-// import android.location.LocationManager;
-// import android.os.Bundle;
-// import android.view.View;
-// import android.widget.Button;
-// import android.widget.Toast;
-//
-// import com.google.android.maps.GeoPoint;
-// import com.google.android.maps.MapActivity;
-// import com.google.android.maps.MapController;
-// import com.google.android.maps.MapView;
-// import com.google.android.maps.MyLocationOverlay;
-//
-// public class FreeBikeActivity extends MapActivity {
-// private MapView mMapView;
-// private MyLocationOverlay mMyLocationOverlay;
-//
-// /** Called when the activity is first created. */
-// @Override
-// public void onCreate(Bundle savedInstanceState) {
-// super.onCreate(savedInstanceState);
-// setContentView(R.layout.mapview);
-//
-// mMapView = (MapView)findViewById(R.id.map_view);
-// mMapView.setBuiltInZoomControls(true);
-//
-// mMyLocationOverlay = new FixedMyLocationOverlay(this, mMapView);
-// mMyLocationOverlay.runOnFirstFix(new Runnable() { public void run() {
-// mMapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
-// }});
-// mMapView.getOverlays().add(mMyLocationOverlay);
-//
-// mMapView.postInvalidate();
-//
-// // call convenience method that zooms map on our location
-// zoomToMyLocation();
-//
-// // MapController mMapController = mMapView.getController();
-// // //GeoPoint point = new GeoPoint((int) (30.281772 * 1e6), (int) (120.120029 * 1e6));
-// // //mMapController.animateTo(point);
-// // //mMapController.setCenter(point);
-// // mMapController.setZoom(16);
-// // GeoPoint myGeoPoint = getCurrentGeoPoint();
-// // if (myGeoPoint != null) {
-// // mMapController.animateTo(myGeoPoint);
-// // }
-//
-// Button btnList = (Button)findViewById(R.id.btn_list);
-// btnList.setOnClickListener(new View.OnClickListener() {
-// public void onClick(View v) {
-// Intent intent = new Intent();
-// intent.setClass(FreeBikeActivity.this, StopListActivity.class);
-// startActivity(intent);
-// FreeBikeActivity.this.finish();
-// }
-// });
-//
-// }
-//
-// private GeoPoint getCurrentGeoPoint() {
-// Location location = null;
-// LocationManager locationManager = (LocationManager)
-// getSystemService(Context.LOCATION_SERVICE);
-// if
-// (locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER))
-// {
-// location =
-// locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-// }
-// else if
-// (locationManager.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER))
-// {
-// location =
-// locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-// }
-// else {
-// return null;
-// }
-//
-// return new GeoPoint((int) (location.getLatitude() * 1e6),
-// (int) (location.getLongitude() * 1e6));
-// }
-//
-// @Override
-// protected void onResume() {
-// super.onResume();
-// // when our activity resumes, we want to register for location updates
-// mMyLocationOverlay.enableMyLocation();
-// }
-//
-// @Override
-// protected void onPause() {
-// super.onPause();
-// // when our activity pauses, we want to remove listening for location updates
-// mMyLocationOverlay.disableMyLocation();
-// }
-//
-// /**
-// * This method zooms to the user's location with a zoom level of 10.
-// */
-// private void zoomToMyLocation() {
-// GeoPoint myLocationGeoPoint = mMyLocationOverlay.getMyLocation();
-// if (myLocationGeoPoint == null) {
-// Toast.makeText(this, "Cannot determine location", Toast.LENGTH_SHORT).show();
-// myLocationGeoPoint = new GeoPoint((int) (30.281772 * 1e6), (int) (120.120029 * 1e6));
-// }
-//
-// mMapView.getController().animateTo(myLocationGeoPoint);
-// mMapView.getController().setZoom(12);
-// }
-//
-// @Override
-// protected boolean isRouteDisplayed() {
-// // TODO Auto-generated method stub
-// return false;
-// }
-// }

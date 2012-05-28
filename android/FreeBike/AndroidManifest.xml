@@ -16,13 +16,13 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:name=".FreeBikeApp" >
+        android:name="com.hippocrene.FreeBikeApp" >
         <uses-library android:name="com.google.android.maps" />
         
         <activity
-            android:name=".view.FreeBikeActivity"
+            android:name="com.hippocrene.view.FreeBikeActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
@@ -38,8 +38,16 @@
                 android:resource="@xml/searchable" >
             </meta-data>
         </activity>
+        
         <activity
-            android:name=".view.StartupActivity"
+            android:name="com.hippocrene.view.StationListActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        
+        <activity
+            android:name="com.hippocrene.view.StartupActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
@@ -48,14 +56,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".view.StationListActivity"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar" >
-        </activity>
-        
+
         <!-- <meta-data android:value="4e0c22ce431fe3420f000155" android:name="UMENG_APPKEY"></meta-data> -->
-		<provider android:name=".view.SearchSuggestionProvider" android:authorities="com.hippocrene.view.SearchSuggestionProvider"></provider>
+		<provider android:name="com.hippocrene.view.SearchSuggestionProvider" android:authorities="com.hippocrene.view.SearchSuggestionProvider"></provider>
     </application>
 
 </manifest>

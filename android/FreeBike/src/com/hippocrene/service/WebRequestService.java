@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.hippocrene.R;
 import com.hippocrene.model.StationBikeInfo;
@@ -90,9 +91,18 @@ public class WebRequestService {
 					stInfo.setAddress(jobj.getString("addr"));
 					stInfo.setTelephone(jobj.getString("tel"));
 					stInfo.setServiceTime(jobj.getString("svTm"));
-					stInfo.setBikeSum(jobj.getInt("sum"));
-					stInfo.setLatitude(jobj.getDouble("lat"));
-					stInfo.setLongtitude(jobj.getDouble("lng"));
+					String tmpS = jobj.getString("sum");
+					if (tmpS != null && tmpS.length() > 0) {
+						stInfo.setBikeSum(Integer.valueOf(tmpS));
+					}
+					tmpS = jobj.getString("lat");
+					if (tmpS != null && tmpS.length() > 0) {
+						stInfo.setLatitude(Double.valueOf(tmpS));
+					}
+					tmpS = jobj.getString("lng");
+					if (tmpS != null && tmpS.length() > 0) {
+						stInfo.setLongtitude(Double.valueOf(tmpS));
+					}
 					stInfo.setUpdateTime(CommonUtil.stringDateToLong(sdf,
 							jobj.getString("updtTm")));
 					stInfo.setTip(jobj.getString("tp"));
